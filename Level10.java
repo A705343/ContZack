@@ -51,9 +51,18 @@ public class Level10 {
     public void start() {
         Pane pane = new Pane();
         pane.setStyle("-fx-background-color: black;");
-
+         spikes.clearSpikesFromGame(pane);
         // Initialize the checkerboard for Level 10 (6x6 grid)
         checkerboard = new Checkerboard(6, 6, 100, 1);
+        
+        // Initialize the canvas for drawing game objects
+        Canvas canvas = new Canvas(
+                (checkerboard.getCheckerboardWidth() + 2 * checkerboard.getBorderSize()) * checkerboard.getCellSize(),
+                (checkerboard.getCheckerboardHeight() + 2 * checkerboard.getBorderSize()) * checkerboard.getCellSize()
+        );
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        pane.getChildren().add(canvas);
+        initializeGameBoard(pane);
         
         // Create and add the arrow
       int arrowX = 0; // Column (0-indexed)
@@ -85,17 +94,10 @@ public class Level10 {
       );
       //secondArrow.getImageView().setRotate(180);
       pane.getChildren().add(secondArrow.getImageView());
- 
         
+      arrow.getImageView().toFront(); // Move the arrow to the front
+      secondArrow.getImageView().toFront(); // Move the arrow to the front
 
-        // Initialize the canvas for drawing game objects
-        Canvas canvas = new Canvas(
-                (checkerboard.getCheckerboardWidth() + 2 * checkerboard.getBorderSize()) * checkerboard.getCellSize(),
-                (checkerboard.getCheckerboardHeight() + 2 * checkerboard.getBorderSize()) * checkerboard.getCellSize()
-        );
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        pane.getChildren().add(canvas);
-        initializeGameBoard(pane);
 
         // Character initialization
         Image characterImage = new Image("Assets/jack1.png");
@@ -162,6 +164,7 @@ public class Level10 {
         double backgroundHeight = checkerboard.getCheckerboardHeight() * checkerboard.getCellSize();
 
         ImageView background = new ImageView("Assets/stoneFloor.jpg");
+      
 
         // Set background size to match the board
         background.setFitWidth(backgroundWidth);

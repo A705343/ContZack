@@ -53,7 +53,7 @@ public class Level9 {
     public void start() {
         Pane pane = new Pane();
         pane.setStyle("-fx-background-color: black;");
-
+          spikes.clearSpikesFromGame(pane);
         // Initialize the checkerboard for Level 9 (7x7 grid)
         checkerboard = new Checkerboard(7, 7, 100, 1);
 
@@ -119,7 +119,7 @@ public class Level9 {
         createWalls(pane);
         
           // Create conveyor belt on the right side of the water obstacle
-        conveyorBelt = new ConveyorBelt(10, "DOWN"); // Speed and direction
+        conveyorBelt = new ConveyorBelt(10, "UP"); // Speed and direction
         pane.getChildren().add(conveyorBelt.getBeltView()); // Add conveyor belt to the pane
         conveyorBelt.getBeltView().setLayoutX(6 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize());
         conveyorBelt.getBeltView().setLayoutY(4 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize());

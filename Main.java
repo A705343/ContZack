@@ -28,7 +28,7 @@ public class Main extends Application {
 
     private void showMainScreen() {
         MainScreen mainScreen = new MainScreen(primaryStage);
-        mainScreen.setOnStartLevel1(this::startLevel3);
+        mainScreen.setOnStartLevel1(this::startLevel1);
         primaryStage.setScene(mainScreen.getScene());
         primaryStage.setTitle("Contraption Zack");
         primaryStage.show();
@@ -118,7 +118,7 @@ public class Main extends Application {
         
         
          private void startLevel9() {
-         Level9 level9 = new Level9(primaryStage, 1, 4);
+         Level9 level9 = new Level9(primaryStage, 1, 0);
          level9.setOnLevelComplete(this::startLevel8);
          level9.setOnLevelComplete2(this::startLevel8);
          level9.setOnLevelComplete3(this::startLevel10);

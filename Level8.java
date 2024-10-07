@@ -37,13 +37,15 @@ public class Level8 {
     private Runnable onLevelComplete2;
     private Runnable onLevelComplete3;
     private Runnable onLevelComplete4;
-    private Switch switchObject; // Switch object
+    private DoorSwitch switchObject; // Switch object
     private Pane gamePane;
     private List<Button> buttons = new ArrayList<>();
     private List<Spikes> spikesList = new ArrayList<>();
      private Spikes spikes;
      private Launchpad launchpad;
-      private ConveyorBelt conveyorBelt; // Conveyor belt object
+     private Door door; // Door object
+     private boolean isDoorCollision = false; // Track if the door is collided
+
       
 
     public Level8(Stage primaryStage, int startX, int startY) {
@@ -58,7 +60,7 @@ public class Level8 {
     public void start() {
         Pane pane = new Pane();
         pane.setStyle("-fx-background-color: black;");
-
+          spikes.clearSpikesFromGame(pane);
         // Initialize the checkerboard for Level 8 (7x7 grid)
         checkerboard = new Checkerboard(7, 7, 100, 1);
 
@@ -71,7 +73,20 @@ public class Level8 {
         pane.getChildren().add(canvas);
         initializeGameBoard(pane);
         
-        
+    // Initialize the door
+door = new Door("Assets/Door.png"); // Assuming the Door constructor only accepts the image path
+pane.getChildren().add(door.getDoorView()); // Add door to the pane
+
+// Set the door image size to 100x100
+door.getDoorView().setFitWidth(100);  // Set width to 100
+door.getDoorView().setFitHeight(100); // Set height to 100
+
+// Set the door position
+door.setPosition(
+    3 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize(),
+    1 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize()
+);
+
         
         
          // Create and add the arrow
@@ -159,7 +174,7 @@ public class Level8 {
          
          // Add orange spikes
          Spikes orangeSpike1 = new Spikes(gamePane);
-         orangeSpike1.addSpikeToGame(pane, "orange", 500, 500, true, 20, 75);
+         orangeSpike1.addSpikeToGame(pane, "orange", 500, 500, false, 20, 75);
          spikesList.add(orangeSpike1);  
          
        
@@ -174,17 +189,13 @@ public class Level8 {
          
        
        
-         // Create conveyor belt on the right side of the water obstacle
-        conveyorBelt = new ConveyorBelt(10, "LEFT"); // Speed and direction
-        pane.getChildren().add(conveyorBelt.getBeltView()); // Add conveyor belt to the pane
-        conveyorBelt.getBeltView().setLayoutX(3 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize());
-        conveyorBelt.getBeltView().setLayoutY(1 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize());
+  
 
                  // Create switch below the wall on the left side
-        switchObject = new Switch( conveyorBelt, "Assets/switch.png"); // Path to switch image
-        pane.getChildren().add(switchObject.getSwitchView()); // Add the switch to the pane
-        switchObject.getSwitchView().setLayoutX(1 * checkerboard.getCellSize()); // Set position as needed
-        switchObject.getSwitchView().setLayoutY(1 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize());
+       DoorSwitch switchObject = new DoorSwitch(door, "Assets/switch.png");
+         pane.getChildren().add(switchObject.getSwitchView()); // Add the switch to the pane
+         switchObject.getSwitchView().setLayoutX(1 * checkerboard.getCellSize()); // Set position as needed
+         switchObject.getSwitchView().setLayoutY(1 * checkerboard.getCellSize() + checkerboard.getBorderSize() * checkerboard.getCellSize());
               
 
         
@@ -246,13 +257,42 @@ public class Level8 {
                 checkLaunchpadInteraction();
                  checkButtonInteraction();
                  checkSpikeCollisions();
-                  conveyorBelt.moveCharacter(character);
-                  // Check if the switch is activated by the character
-                if (switchObject.checkCollision(character)) {
-                    switchObject.activate();
-
+                 // Check for collision with the door
+                if (door.getDoorView().getBoundsInParent().intersects(character.getBoundsInParent())) {
+                    isDoorCollision = true;
+                } else {
+                    isDoorCollision = false; // Reset collision state
                 }
-              
+
+                if (isDoorCollision && !door.isOpen()) {
+                                     
+                
+                double characterX = character.getLayoutX();
+                double characterY = character.getLayoutY();
+
+                // Prevent character from crossing the wall
+                if (pressedKeys.contains(KeyCode.W)) {
+                    character.setLayoutY(characterY + 5);
+                }
+                if (pressedKeys.contains(KeyCode.S)) {
+                    character.setLayoutY(characterY - 5);
+                }
+                if (pressedKeys.contains(KeyCode.A)) {
+                    character.setLayoutX(characterX + 5);
+                }
+                if (pressedKeys.contains(KeyCode.D)) {
+                    character.setLayoutX(characterX - 5);
+                }
+              }
+                 
+               if (switchObject.checkCollision(character)) {
+                      switchObject.activate();
+              if (door.isOpen()) {
+                      door.close(); // Close the door if it's open
+             } else {
+                      door.open(); // Open the door if it's closed
+            }
+}
 
                 // Check for level completion (arrow collision)
                 checkLevelCompletion();
